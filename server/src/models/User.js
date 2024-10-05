@@ -9,5 +9,5 @@ const userSchema = new Schema({
     timestamps : true
 });
 
-const User = model("User", userSchema);
-module.exports = User;
+const UserModel = model("users", userSchema);
+module.exports = UserModel;
