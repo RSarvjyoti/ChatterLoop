@@ -2,7 +2,9 @@ function App() {
 
   return (
     <>
-    <h1>Hello</h1>
+    <main className="font-bold text-2xl">
+      React App
+    </main>
     </>
   )
 }

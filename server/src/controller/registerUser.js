@@ -70,47 +70,59 @@ const emailVerify = async (req, res) => {
 
 //  Check password
 const checkPassword = async (req, res) => {
-  try{
-    const {password, userId} = req.body;
+  try {
+    const { password, userId } = req.body;
 
+    // Find user by ID
     const user = await UserModel.findById(userId);
 
-    // compare the hash password
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        error: true,
+      });
+    }
+
+    // Compare the provided password with the hashed password
     const verifyPassword = await bcryptjs.compare(password, user.password);
 
-    if(!verifyPassword) {
+    if (!verifyPassword) {
       return res.status(400).json({
-        message : "Please check password.",
-        error : true,
-      })
+        message: "Incorrect password.",
+        error: true,
+      });
     }
 
-    // genrate jwt token
+    // Generate JWT token
     const tokenData = {
-      id : user._id,
-      email : user.email
-    }
-    const token = await jwt.sign(tokenData, process.env.SECRET_KEY, {expiresIn : "1d"});
+      id: user._id,
+      email: user.email,
+    };
+    
+    const token = jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: "1d" });
 
-    // Set token into cookies
-
+    // Set token into cookies with additional options
     const cookieOptions = {
-      http : true,
-      secure : true
-    }
+      httpOnly: true, // ensures cookie is only accessible via HTTP(S)
+      secure: process.env.NODE_ENV === "production", // ensures cookie is sent only over HTTPS in production
+      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+    };
 
-    return res.cookie('token', token, cookieOptions ).status(200).json({
-      message : "Login successfully.",
-      token : token,
-      success : true,
-    })
-
-  } catch(error) {
+    return res
+      .cookie("token", token, cookieOptions)
+      .status(200)
+      .json({
+        message: "Login successfully.",
+        token: token,
+        success: true,
+      });
+  } catch (error) {
     return res.status(500).json({
       message: error.message || error,
       error: true,
-    })
+    });
   }
-}
+};
+
 
 module.exports = { register, emailVerify, checkPassword };
