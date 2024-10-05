@@ -14,6 +14,10 @@ app.use(cors({
 }))
 
 app.listen(PORT, async () => {
-    await connectDb(DB_URL);
-    console.log(`Server is runing at : http://localhost:${PORT}`);
+    try{
+        await connectDb(DB_URL);
+        console.log(`Server is runing at : http://localhost:${PORT}`);
+    }catch(err) {
+        console.log(err);
+    }
 })
