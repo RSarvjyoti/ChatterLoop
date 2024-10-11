@@ -6,6 +6,7 @@ const Home = () => {
     <div>
       
       {/* message component */}
+      Home
       <section>
         <Outlet />
       </section>
